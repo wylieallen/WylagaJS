@@ -16,8 +16,9 @@ export default class ShipDisplayable extends EntityDisplayable {
             this.hit();
         };
 
-        const innerFire = entity.fire;
-        entity.fire = (x, y) => {
+        const innerFire = entity.onFire;
+        entity.onFire = (x, y) => {
+            console.log("firing from wrapped entity fire")
             innerFire(x, y);
             this.fire();
         };

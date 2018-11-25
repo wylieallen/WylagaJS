@@ -57,29 +57,36 @@ function makeNewExplosion(entity, radius, color, particleCount, onExpire) {
 }
 
 function makeNewPlayerSpecialDisplayable(entity) {
-    const displayable = new ImageDisplayable(7, 24, Images.PLAYER_SPECIAL_BASE);
+   return makeModularSpecialDisplayable(entity, 7, 24, Images.PLAYER_SPECIAL_BASE, Images.PLAYER_SPECIAL_DEPLOYED);
+}
 
-    displayable.activate = () => displayable.setImage(Images.PLAYER_SPECIAL_DEPLOYED);
-    displayable.deactivate = () => displayable.setImage(Images.PLAYER_SPECIAL_BASE);
+function makeModularSpecialDisplayable(entity, x, y, base, deployed) {
+    const displayable = new ImageDisplayable(x, y, base);
+
+    displayable.activate = () => displayable.setImage(deployed);
+    displayable.deactivate = () => displayable.setImage(base);
 
     return displayable;
 }
 
 function makeNewPlayerBodyDisplayable(entity) {
-    const displayable = new ImageDisplayable(0, 0, Images.PLAYER_CHASSIS_BASE);
+    return makeModularBodyDisplayable(
+        entity, Images.PLAYER_CHASSIS_BASE, Images.PLAYER_CHASSIS_HURT, Images.PLAYER_CHASSIS_DIRE, 20
+    );
+}
+
+function makeModularBodyDisplayable(entity, baseImage, hurtImage, direImage, direThreshold = 20, duration = 3) {
+    const displayable = new ImageDisplayable(0, 0, baseImage);
 
     displayable.hit = () => {
-        let counter = 3;
-        displayable.setImage(Images.PLAYER_CHASSIS_HURT);
+        let counter = duration;
+        displayable.setImage(hurtImage);
         displayable.update = () => {
             if(--counter <= 0) {
-                if(entity.getHealth() <= 20)
-                {
-                    displayable.setImage(Images.PLAYER_CHASSIS_DIRE);
-                }
-                else
-                {
-                    displayable.setImage(Images.PLAYER_CHASSIS_BASE);
+                if(entity.getHealth() <= direThreshold) {
+                    displayable.setImage(direImage);
+                } else {
+                    displayable.setImage(baseImage);
                 }
             }
         }
@@ -89,31 +96,28 @@ function makeNewPlayerBodyDisplayable(entity) {
 }
 
 function makeNewPlayerEngineDisplayable(entity) {
+    const down = new ImageDisplayable(0, 0, Images.PLAYER_ENGINE_BRAKE);
+    const neutral = new CircularAnimation(0, 0, [Images.PLAYER_ENGINE_BASE_1, Images.PLAYER_ENGINE_BASE_2], 40);
+    const up = new CircularAnimation(0, 0, [Images.PLAYER_ENGINE_BOOST_1, Images.PLAYER_ENGINE_BOOST_2], 10);
+    return makeModularEngineDisplayable(entity, 12, 35, up, down, neutral);
+}
 
-    const root = new CompositeDisplayable(12, 35);
+function makeModularEngineDisplayable(entity, x , y, up, down, neutral) {
+    const root = new CompositeDisplayable(x, y);
 
-    const downAnimation = new ImageDisplayable(0, 0, Images.PLAYER_ENGINE_BRAKE);
-    const neutralAnimation = new CircularAnimation(0, 0, [Images.PLAYER_ENGINE_BASE_1, Images.PLAYER_ENGINE_BASE_2], 40);
-    const upAnimation = new CircularAnimation(0, 0, [Images.PLAYER_ENGINE_BOOST_1, Images.PLAYER_ENGINE_BOOST_2], 10);
-
-    root.add(neutralAnimation);
+    root.add(neutral);
 
     root.changeDirection = () => {
         const dy = entity.getDy();
 
         root.clear();
 
-        if(dy < 0)
-        {
-            root.add(upAnimation);
-        }
-        else if(dy > 0)
-        {
-            root.add(downAnimation);
-        }
-        else
-        {
-            root.add(neutralAnimation);
+        if(dy < 0) {
+            root.add(up);
+        } else if(dy > 0) {
+            root.add(down);
+        } else {
+            root.add(neutral);
         }
     };
 
@@ -121,16 +125,18 @@ function makeNewPlayerEngineDisplayable(entity) {
 }
 
 function makeNewPlayerWeaponDisplayable(entity) {
-    const displayable = new ImageDisplayable(22, 0, Images.PLAYER_WEAPON_BASE);
+    return makeModularWeaponDisplayable(entity, 22, 0, Images.PLAYER_WEAPON_BASE, Images.PLAYER_WEAPON_FIRE);
+}
+
+function makeModularWeaponDisplayable(entity, x, y, baseImage, firingImage, duration = 3) {
+    const displayable = new ImageDisplayable(x, y, baseImage);
 
     displayable.fire = () => {
-        const prev = displayable.getImage();
         let counter = 3;
-        displayable.setImage(Images.PLAYER_WEAPON_FIRE);
+        displayable.setImage(firingImage);
         displayable.update = () => {
-            if(--counter <= 0)
-            {
-                displayable.setImage(prev);
+            if(--counter <= 0) {
+                displayable.setImage(baseImage);
                 displayable.update = () => {};
             }
         }
@@ -139,25 +145,37 @@ function makeNewPlayerWeaponDisplayable(entity) {
     return displayable;
 }
 
-export function makeNewEnemyDisplayable(entity, onExpire) {
+export function makeModularEnemyDisplayable(entity, onExpire) {
     const explosion = makeNewPlayerExplosion(entity, onExpire);
     const explode = function() {
         explosion.centerOn(entity);
         this.setSprite(explosion);
     };
 
-    const displayable = new ShipDisplayable(entity, makeImageDisplayable(Images.enemy), explode, onExpire,
-        () => {},
-        () =>
-        {
-            displayable.setSprite(new LinearAnimation(0,0, [Images.hurtEnemy], 3,
-                () => displayable.setSprite(makeImageDisplayable(Images.enemy))));
-        },
-        ()=>{},
-        ()=>{},
-        ()=>{});
+    const body = makeEnemyBodyDisplayable(entity);
+    const weapon = makeEnemyWeaponDisplayable(entity);
+    const engine = makeEnemyEngineDisplayable(entity);
+    const special = makeEnemySpecialDisplayable(entity);
 
-    return displayable;
+    return new ModularShipDisplayable(entity, explode, onExpire, body, weapon, engine, special);
+}
+
+function makeEnemyBodyDisplayable(entity) {
+    return makeModularBodyDisplayable(entity, Images.ENEMY_CHASSIS_BASE, Images.ENEMY_CHASSIS_HURT, Images.ENEMY_CHASSIS_DIRE);
+}
+
+function makeEnemyWeaponDisplayable(entity) {
+    return makeModularWeaponDisplayable(entity, 6, 22, Images.ENEMY_WEAPON_BASE, Images.ENEMY_WEAPON_FIRE);
+}
+
+function makeEnemyEngineDisplayable(entity) {
+    const up = new ImageDisplayable(0, 0, Images.ENEMY_ENGINE_BASE);
+    const down = new ImageDisplayable(0, 0, Images.ENEMY_ENGINE_BOOST);
+    return makeModularEngineDisplayable(entity, 7, 0, up, down, up);
+}
+
+function makeEnemySpecialDisplayable(entity) {
+    return makeModularSpecialDisplayable(entity, 3, 4, Images.ENEMY_SPECIAL_BASE, Images.ENEMY_SPECIAL_DEPLOYED);
 }
 
 export function makeNewBigEnemyDisplayable(entity, onExpire) {

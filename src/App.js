@@ -11,6 +11,8 @@ import KeyboardController from "./control/KeyboardController";
 import Ship from "./wylaga/entities/Ship";
 import Displayable from "./displayables/Displayable";
 import TextDisplayable from "./displayables/primitives/TextDisplayable";
+import WaveController from "./wylaga/control/WaveController";
+import Projectile from "./wylaga/entities/Projectile";
 
 const WIDTH = 1600, HEIGHT = 900;
 
@@ -46,7 +48,7 @@ class App extends Component {
 
         this.initializeEventListeners(game, entityLayer, entityToSpriteMap);
 
-        const northProjectileCatcher = new Ship(-50, -50, WIDTH, 50, 0, -1);
+        const northProjectileCatcher = new Ship(-50, -100, WIDTH, 50, 0, -1);
         northProjectileCatcher.isDead = () => false;
         entityToSpriteMap.set(northProjectileCatcher, new Displayable(0, 0, () => {}));
         game.spawnHostileShip(northProjectileCatcher);
@@ -56,8 +58,10 @@ class App extends Component {
         entityToSpriteMap.set(southProjectileCatcher, new Displayable(0, 0, () => {}));
         game.spawnFriendlyShip(southProjectileCatcher);
 
-        const badGuy = new Ship(500, 500, 25, 25, 5, 100, game.expireHostileShip, () => {});
-        entityToSpriteMap.set(badGuy, Sprites.makeNewEnemyDisplayable(badGuy, () => {
+        const badGuy = new Ship(500, 500, 25, 25, 5, 100, game.expireHostileShip, (x, y) => {
+            game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), this._player)
+        });
+        entityToSpriteMap.set(badGuy, Sprites.makeModularEnemyDisplayable(badGuy, () => {
             entityLayer.remove(entityToSpriteMap.get(badGuy));
         }));
 
@@ -67,9 +71,8 @@ class App extends Component {
         }));
 
         const playerEntity = game.getPlayer();
-
         entityToSpriteMap.set(playerEntity, Sprites.makeModularPlayerDisplayable(playerEntity, () => {
-                entityLayer.remove(entityToSpriteMap.get(playerEntity));
+            entityLayer.remove(entityToSpriteMap.get(playerEntity));
         }));
 
         game.spawnHostileShip(badGuy);
@@ -84,6 +87,7 @@ class App extends Component {
         this.root = root;
 
         this.initializeController(playerEntity);
+        this.initializeEnemyController(badGuy);
 
         requestAnimationFrame(this.tick)
     }
@@ -105,6 +109,7 @@ class App extends Component {
         while(delta >= this.dt)
         {
             delta -= this.dt;
+            this.enemyController.update();
             this.playerController.update();
             this.canvas.current.update();
             this.canvas.current.repaint();
@@ -144,6 +149,10 @@ class App extends Component {
             entityLayer.add(projectileDisplayable);
             entityToSpriteMap.set(projectile, projectileDisplayable);
         });
+    }
+
+    initializeEnemyController(enemy) {
+        this.enemyController = new WaveController(enemy);
     }
 
     initializeController(player) {
