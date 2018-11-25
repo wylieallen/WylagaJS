@@ -37,8 +37,8 @@ class App extends Component {
         root.add(entityLayer);
         root.add(hudLayer);
 
-        hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "HP: " + this.game.getPlayer().getHealth()));
-        hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "FUEL: " + this.game.getPlayer().getCurrentFuel()));
+        hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "SHIELD: " + this.game.getPlayer().getHealth()));
+        hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "POWER: " + this.game.getPlayer().getCurrentFuel()));
 
         // Initialize game:
         this.game = new Game(WIDTH, HEIGHT);
@@ -48,48 +48,40 @@ class App extends Component {
 
         this.initializeEventListeners(game, entityLayer, entityToSpriteMap);
 
-        const northProjectileCatcher = new Ship(-50, -100, WIDTH, 50, 0, -1);
-        northProjectileCatcher.isDead = () => false;
-        entityToSpriteMap.set(northProjectileCatcher, new Displayable(0, 0, () => {}));
-        game.spawnHostileShip(northProjectileCatcher);
+        const removeEntitySprite = function() {
+            entityLayer.remove(this)
+        };
 
-        const southProjectileCatcher = new Ship(-50, 1650, WIDTH, 50, 0, -1);
-        southProjectileCatcher.isDead = () => false;
-        entityToSpriteMap.set(southProjectileCatcher, new Displayable(0, 0, () => {}));
-        game.spawnFriendlyShip(southProjectileCatcher);
-
-        const badGuy = new Ship(500, 500, 25, 25, 5, 100, game.expireHostileShip, (x, y) => {
-            game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), this._player)
+        const badGuy = new Ship(500, 500, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
+            game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy)
         });
-        entityToSpriteMap.set(badGuy, Sprites.makeModularEnemyDisplayable(badGuy, () => {
-            entityLayer.remove(entityToSpriteMap.get(badGuy));
-        }));
+        entityToSpriteMap.set(badGuy, Sprites.makeModularEnemyDisplayable(badGuy, removeEntitySprite));
 
-        const bigBadGuy = new Ship(550, 450, 50, 50, 5, 100, game.expireHostileShip, () => {});
-        entityToSpriteMap.set(bigBadGuy, Sprites.makeNewBigEnemyDisplayable(bigBadGuy, () => {
-            entityLayer.remove(entityToSpriteMap.get(bigBadGuy));
-        }));
+        const badGuy2 = new Ship(600, 500, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
+            game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy2)
+        });
+        entityToSpriteMap.set(badGuy2, Sprites.makeModularEnemyDisplayable(badGuy2, removeEntitySprite));
+
+        const bigBadGuy = new Ship(550, 450, 50, 50, 0.3, 150, game.expireHostileShip, (x, y) => {
+            game.spawnHostileProjectile(new Projectile(x + 21, y + 42, 8, 8, 6, 0, 1, ship => ship.damage(25)), bigBadGuy);
+        });
+        entityToSpriteMap.set(bigBadGuy, Sprites.makeNewBigEnemyDisplayable(bigBadGuy, removeEntitySprite));
 
         const playerEntity = game.getPlayer();
-        entityToSpriteMap.set(playerEntity, Sprites.makeModularPlayerDisplayable(playerEntity, () => {
-            entityLayer.remove(entityToSpriteMap.get(playerEntity));
-        }));
+        entityToSpriteMap.set(playerEntity, Sprites.makeModularPlayerDisplayable(playerEntity, removeEntitySprite));
 
         game.spawnHostileShip(badGuy);
+        game.spawnHostileShip(badGuy2);
         game.spawnHostileShip(bigBadGuy);
         game.spawnFriendlyShip(playerEntity);
-
-        this.dt = 17;
-        this.carry = 0;
-        this.now = this.last = this.timestamp();
 
         this.game = game;
         this.root = root;
 
         this.initializeController(playerEntity);
-        this.initializeEnemyController(badGuy);
+        this.initializeEnemyController([badGuy, badGuy2, bigBadGuy]);
 
-        requestAnimationFrame(this.tick)
+        this.startTimer();
     }
 
     timestamp = () => {
@@ -100,6 +92,13 @@ class App extends Component {
     last;
     dt;
     carry;
+
+    startTimer = () => {
+        this.dt = 17;
+        this.carry = 0;
+        this.now = this.last = this.timestamp();
+        requestAnimationFrame(this.tick)
+    };
 
     tick = () => {
         this.now = this.timestamp();

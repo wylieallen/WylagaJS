@@ -49,6 +49,14 @@ export default class Game {
            friendly.damage(30);
            hostile.damage(30);
         });
+
+        const northProjectileCatcher = new Ship(-50, -100, width + 100, 50, 0, -1);
+        northProjectileCatcher.isDead = () => false;
+        this.spawnHostileShip(northProjectileCatcher);
+
+        const southProjectileCatcher = new Ship(-50, 950, width + 100, 50, 0, -1);
+        southProjectileCatcher.isDead = () => false;
+        this.spawnFriendlyShip(southProjectileCatcher);
     }
 
     expireFriendlyProjectile = projectile => this._expireds[1].add(projectile);
