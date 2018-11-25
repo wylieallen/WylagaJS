@@ -5,8 +5,7 @@ export default class TextDisplayable extends Displayable {
 
     constructor(x, y, color, getString, font = "16px Arial", onUpdate = () => {})
     {
-        super
-        (
+        super(
             x, y,
             ctx => {
                 ctx.fillStyle = this.getColor();

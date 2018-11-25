@@ -13,4 +13,5 @@ export default class CompositeDisplayable extends Displayable {
     add = (d) => this._components.add(d);
     remove = (d) => this._components.delete(d);
     size = () => this._components.size;
+    clear = () => this._components.clear();
 }

@@ -33,9 +33,8 @@ export default class KeyboardController {
     update = () => {
         const dx = KeyboardController.getSign(this.rightPressed, this.leftPressed);
         const dy = KeyboardController.getSign(this.downPressed, this.upPressed);
-        const trajectory = new UnitVector(dx, dy)
-        this._entity.setDx(trajectory.getDx());
-        this._entity.setDy(trajectory.getDy());
+        const trajectory = new UnitVector(dx, dy);
+        this._entity.setTrajectory(trajectory.getDx(), trajectory.getDy());
         this._entity.setFiring(this.isFiring);
         this._entity.setBoosting(this.isBoosting);
     }
