@@ -26,51 +26,25 @@ class App extends Component {
         super(props);
         this.canvas = React.createRef();
 
+        // Initialize display tree:
         const root = new CompositeDisplayable(0, 0);
         const entityLayer = new CompositeDisplayable(0, 0);
-        const effectLayer = new CompositeDisplayable(0, 0);
         const hudLayer = new CompositeDisplayable(0, 0);
+
         root.add(new Starfield(WIDTH, HEIGHT, 200));
         root.add(entityLayer);
-        root.add(effectLayer);
         root.add(hudLayer);
+
+        hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "HP: " + this.game.getPlayer().getHealth()));
+        hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "FUEL: " + this.game.getPlayer().getCurrentFuel()));
+
+        // Initialize game:
+        this.game = new Game(WIDTH, HEIGHT);
+        const game = this.game;
 
         const entityToSpriteMap = new Map();
 
-        const game = new Game();
-
-        const expireEntityDisplayable = function() {
-            entityLayer.remove(this);
-            entityToSpriteMap.delete(this.getEntity());
-        };
-
-        const playerEntity = game.getPlayer();
-        playerEntity.setLocation(
-            (WIDTH / 2) - (playerEntity.getWidth() / 2),
-            (3 * HEIGHT / 4) - (playerEntity.getHeight() / 2)
-        );
-
-        entityToSpriteMap.set(playerEntity, Sprites.makeModularPlayerDisplayable(playerEntity,
-            () => {
-            entityLayer.remove(entityToSpriteMap.get(playerEntity));
-        }));
-
-        game.subscribeShipSpawned(ship => {
-            entityLayer.add(entityToSpriteMap.get(ship));
-        });
-
-        game.subscribeEntityExpired(entity => {
-            entityToSpriteMap.get(entity).explode();
-        });
-
-        game.subscribeProjectileSpawned((projectile, source) => {
-            const projectileDisplayable = Sprites.makeProjectileDisplayable(projectile, () => {
-                entityLayer.remove(projectileDisplayable);
-            });
-
-            entityLayer.add(projectileDisplayable);
-            entityToSpriteMap.set(projectile, projectileDisplayable);
-        });
+        this.initializeEventListeners(game, entityLayer, entityToSpriteMap);
 
         const northProjectileCatcher = new Ship(-50, -50, WIDTH, 50, 0, -1);
         northProjectileCatcher.isDead = () => false;
@@ -92,12 +66,15 @@ class App extends Component {
             entityLayer.remove(entityToSpriteMap.get(bigBadGuy));
         }));
 
+        const playerEntity = game.getPlayer();
+
+        entityToSpriteMap.set(playerEntity, Sprites.makeModularPlayerDisplayable(playerEntity, () => {
+                entityLayer.remove(entityToSpriteMap.get(playerEntity));
+        }));
+
         game.spawnHostileShip(badGuy);
         game.spawnHostileShip(bigBadGuy);
         game.spawnFriendlyShip(playerEntity);
-
-        hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "HP: " + game.getPlayer().getHealth()));
-        hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "FUEL: " + game.getPlayer().getCurrentFuel()));
 
         this.dt = 17;
         this.carry = 0;
@@ -148,6 +125,25 @@ class App extends Component {
                 </header>
             </div>
         );
+    }
+
+    initializeEventListeners(game, entityLayer, entityToSpriteMap) {
+        game.subscribeShipSpawned(ship => {
+            entityLayer.add(entityToSpriteMap.get(ship));
+        });
+
+        game.subscribeEntityExpired(entity => {
+            entityToSpriteMap.get(entity).explode();
+        });
+
+        game.subscribeProjectileSpawned((projectile, source) => {
+            const projectileDisplayable = Sprites.makeProjectileDisplayable(projectile, () => {
+                entityLayer.remove(projectileDisplayable);
+            });
+
+            entityLayer.add(projectileDisplayable);
+            entityToSpriteMap.set(projectile, projectileDisplayable);
+        });
     }
 
     initializeController(player) {

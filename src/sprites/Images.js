@@ -1,6 +1,4 @@
 import Enemy from "./Enemy.png";
-import Player from "./Player.png";
-import HurtPlayer from "./HurtPlayer.png";
 import HurtEnemy from "./HurtEnemy.png";
 
 import PlayerBaseChassis from "./player/PlayerBaseChassis.png";
@@ -22,26 +20,30 @@ import PlayerFiringWeapon from "./player/PlayerFiringWeapon.png";
 import BigEnemyBase from "./bigenemy/BaseBigEnemy.png";
 import BigEnemyHurt from "./bigenemy/HurtBigEnemy.png";
 
-export const PLAYER_CHASSIS_BASE = PlayerBaseChassis;
-export const PLAYER_CHASSIS_HURT = PlayerHurtChassis;
-export const PLAYER_CHASSIS_DIRE = PlayerNearDeathChassis;
+function makeImage(src) {
+    const image = new Image();
+    image.src = src;
+    return image;
+}
 
-export const PLAYER_SPECIAL_BASE = PlayerBaseSpecial;
-export const PLAYER_SPECIAL_DEPLOYED = PlayerDeployedSpecial;
+export const PLAYER_CHASSIS_BASE = makeImage(PlayerBaseChassis);
+export const PLAYER_CHASSIS_HURT = makeImage(PlayerHurtChassis);
+export const PLAYER_CHASSIS_DIRE = makeImage(PlayerNearDeathChassis);
 
-export const PLAYER_ENGINE_BASE_1 = PlayerBaseEngine1;
-export const PLAYER_ENGINE_BASE_2 = PlayerBaseEngine2;
-export const PLAYER_ENGINE_BOOST_1 = PlayerBoostEngine1;
-export const PLAYER_ENGINE_BOOST_2 = PlayerBoostEngine2;
-export const PLAYER_ENGINE_BRAKE = PlayerBrakeEngine;
+export const PLAYER_SPECIAL_BASE = makeImage(PlayerBaseSpecial);
+export const PLAYER_SPECIAL_DEPLOYED = makeImage(PlayerDeployedSpecial);
 
-export const PLAYER_WEAPON_BASE = PlayerBaseWeapon;
-export const PLAYER_WEAPON_FIRE = PlayerFiringWeapon;
+export const PLAYER_ENGINE_BASE_1 = makeImage(PlayerBaseEngine1);
+export const PLAYER_ENGINE_BASE_2 = makeImage(PlayerBaseEngine2);
+export const PLAYER_ENGINE_BOOST_1 = makeImage(PlayerBoostEngine1);
+export const PLAYER_ENGINE_BOOST_2 = makeImage(PlayerBoostEngine2);
+export const PLAYER_ENGINE_BRAKE = makeImage(PlayerBrakeEngine);
 
-export const BIG_ENEMY_BASE = BigEnemyBase;
-export const BIG_ENEMY_HURT = BigEnemyHurt;
+export const PLAYER_WEAPON_BASE = makeImage(PlayerBaseWeapon);
+export const PLAYER_WEAPON_FIRE = makeImage(PlayerFiringWeapon);
 
-export const enemy = Enemy;
-export const basePlayer = Player;
-export const hurtPlayer = HurtPlayer;
-export const hurtEnemy = HurtEnemy;
+export const BIG_ENEMY_BASE = makeImage(BigEnemyBase);
+export const BIG_ENEMY_HURT = makeImage(BigEnemyHurt);
+
+export const enemy = makeImage(Enemy);
+export const hurtEnemy = makeImage(HurtEnemy);

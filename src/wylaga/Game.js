@@ -21,13 +21,18 @@ export default class Game {
 
     getPlayer = () => this._player;
 
-    constructor() {
+    constructor(width, height) {
         for(let i = 0; i < this._entities.length; i++) {
             this._expireds.push(new Set());
         }
 
-        this._player = new Ship(50, 50, 50, 50, 3, 100, this.expireFriendlyShip,
+        this._player = new Ship(0, 0, 50, 50, 3, 100, this.expireFriendlyShip,
             (x, y) => this.spawnFriendlyProjectile(new Projectile(x + 23, y - 5 - 2, 4, 15, 9, 0, -1, ship => ship.damage(10)), this._player)
+        );
+
+        this._player.setLocation(
+            (width / 2) - (this._player.getWidth() / 2),
+            (3 * height / 4) - (this._player.getHeight() / 2)
         );
 
         this.subscribeHostileProjectile((friendly, projectile) => {

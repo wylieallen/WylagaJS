@@ -1,6 +1,5 @@
 import * as Images from "../../sprites/Images"
 import ImageDisplayable from "../../displayables/primitives/ImageDisplayable";
-import ConditionalDisplayable from "../../displayables/composites/ConditionalDisplayable";
 import CompositeDisplayable from "../../displayables/composites/CompositeDisplayable";
 import UnitVector from "../../utils/UnitVector";
 import SolidRect from "../../displayables/primitives/SolidRect";
@@ -10,7 +9,6 @@ import ModularShipDisplayable from "./ModularShipDisplayable";
 import EntityDisplayable from "./EntityDisplayable";
 import ShipDisplayable from "./ShipDisplayable";
 
-// todo: move all makeImage() to Images
 
 export function makeModularPlayerDisplayable(entity, onExpire) {
     const weapon = makeNewPlayerWeaponDisplayable(entity);
@@ -59,29 +57,29 @@ function makeNewExplosion(entity, radius, color, particleCount, onExpire) {
 }
 
 function makeNewPlayerSpecialDisplayable(entity) {
-    const displayable = new ImageDisplayable(7, 24, makeImage(Images.PLAYER_SPECIAL_BASE));
+    const displayable = new ImageDisplayable(7, 24, Images.PLAYER_SPECIAL_BASE);
 
-    displayable.activate = () => displayable.setImage(makeImage(Images.PLAYER_SPECIAL_DEPLOYED));
-    displayable.deactivate = () => displayable.setImage(makeImage(Images.PLAYER_SPECIAL_BASE));
+    displayable.activate = () => displayable.setImage(Images.PLAYER_SPECIAL_DEPLOYED);
+    displayable.deactivate = () => displayable.setImage(Images.PLAYER_SPECIAL_BASE);
 
     return displayable;
 }
 
 function makeNewPlayerBodyDisplayable(entity) {
-    const displayable = new ImageDisplayable(0, 0, makeImage(Images.PLAYER_CHASSIS_BASE));
+    const displayable = new ImageDisplayable(0, 0, Images.PLAYER_CHASSIS_BASE);
 
     displayable.hit = () => {
         let counter = 3;
-        displayable.setImage(makeImage(Images.PLAYER_CHASSIS_HURT));
+        displayable.setImage(Images.PLAYER_CHASSIS_HURT);
         displayable.update = () => {
             if(--counter <= 0) {
                 if(entity.getHealth() <= 20)
                 {
-                    displayable.setImage(makeImage(Images.PLAYER_CHASSIS_DIRE));
+                    displayable.setImage(Images.PLAYER_CHASSIS_DIRE);
                 }
                 else
                 {
-                    displayable.setImage(makeImage(Images.PLAYER_CHASSIS_BASE));
+                    displayable.setImage(Images.PLAYER_CHASSIS_BASE);
                 }
             }
         }
@@ -94,9 +92,9 @@ function makeNewPlayerEngineDisplayable(entity) {
 
     const root = new CompositeDisplayable(12, 35);
 
-    const downAnimation = new ImageDisplayable(0, 0, makeImage(Images.PLAYER_ENGINE_BRAKE));
-    const neutralAnimation = new CircularAnimation(0, 0, [makeImage(Images.PLAYER_ENGINE_BASE_1), makeImage(Images.PLAYER_ENGINE_BASE_2)], 40);
-    const upAnimation = new CircularAnimation(0, 0, [makeImage(Images.PLAYER_ENGINE_BOOST_1), makeImage(Images.PLAYER_ENGINE_BOOST_2)], 10);
+    const downAnimation = new ImageDisplayable(0, 0, Images.PLAYER_ENGINE_BRAKE);
+    const neutralAnimation = new CircularAnimation(0, 0, [Images.PLAYER_ENGINE_BASE_1, Images.PLAYER_ENGINE_BASE_2], 40);
+    const upAnimation = new CircularAnimation(0, 0, [Images.PLAYER_ENGINE_BOOST_1, Images.PLAYER_ENGINE_BOOST_2], 10);
 
     root.add(neutralAnimation);
 
@@ -123,12 +121,12 @@ function makeNewPlayerEngineDisplayable(entity) {
 }
 
 function makeNewPlayerWeaponDisplayable(entity) {
-    const displayable = new ImageDisplayable(22, 0, makeImage(Images.PLAYER_WEAPON_BASE));
+    const displayable = new ImageDisplayable(22, 0, Images.PLAYER_WEAPON_BASE);
 
     displayable.fire = () => {
         const prev = displayable.getImage();
         let counter = 3;
-        displayable.setImage(makeImage(Images.PLAYER_WEAPON_FIRE));
+        displayable.setImage(Images.PLAYER_WEAPON_FIRE);
         displayable.update = () => {
             if(--counter <= 0)
             {
@@ -152,7 +150,7 @@ export function makeNewEnemyDisplayable(entity, onExpire) {
         () => {},
         () =>
         {
-            displayable.setSprite(new LinearAnimation(0,0, [makeImage(Images.hurtEnemy)], 3,
+            displayable.setSprite(new LinearAnimation(0,0, [Images.hurtEnemy], 3,
                 () => displayable.setSprite(makeImageDisplayable(Images.enemy))));
         },
         ()=>{},
@@ -171,7 +169,7 @@ export function makeNewBigEnemyDisplayable(entity, onExpire) {
     const displayable = new ShipDisplayable(entity, makeImageDisplayable(Images.BIG_ENEMY_BASE), explode, onExpire,
         () => {},
         () => {
-            displayable.setSprite(new LinearAnimation(0, 0, [makeImage(Images.BIG_ENEMY_HURT)], 3,
+            displayable.setSprite(new LinearAnimation(0, 0, [Images.BIG_ENEMY_HURT], 3,
                 () => displayable.setSprite(makeImageDisplayable(Images.BIG_ENEMY_BASE))));
         },
         () => {},
@@ -179,12 +177,6 @@ export function makeNewBigEnemyDisplayable(entity, onExpire) {
         () => {});
 
     return displayable;
-}
-
-function bindEntityToDisplayable(entity, displayable)
-{
-    displayable.getX = entity.getX;
-    displayable.getY = entity.getY;
 }
 
 class Particle extends SolidRect {
@@ -249,12 +241,6 @@ export function makeExplosion(radius, color, particleCount, onExpire) {
     return new Explosion(radius, color, particleCount, onExpire);
 }
 
-function makeImage(src) {
-    const image = new Image();
-    image.src = src;
-    return image;
-}
-
-function makeImageDisplayable(src, update = () => {}) {
-    return new ImageDisplayable(0, 0, makeImage(src), update);
+function makeImageDisplayable(image, update = () => {}) {
+    return new ImageDisplayable(0, 0, image, update);
 }
