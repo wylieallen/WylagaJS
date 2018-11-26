@@ -3,13 +3,12 @@ import './App.css';
 import DisplayCanvas from './components/DisplayCanvas';
 import CompositeDisplayable from "./displayables/composites/CompositeDisplayable";
 import KeyListener from "./control/KeyListener";
+import KeyboardController from "./control/KeyboardController";
 
 import * as Sprites from "./wylaga/displayables/Sprites";
 import Starfield from "./wylaga/displayables/Starfield";
 import Game from "./wylaga/Game";
-import KeyboardController from "./control/KeyboardController";
 import Ship from "./wylaga/entities/Ship";
-import Displayable from "./displayables/Displayable";
 import TextDisplayable from "./displayables/primitives/TextDisplayable";
 import WaveController from "./wylaga/control/WaveController";
 import Projectile from "./wylaga/entities/Projectile";
@@ -44,9 +43,7 @@ class App extends Component {
         this.game = new Game(WIDTH, HEIGHT);
         const game = this.game;
 
-        const entityToSpriteMap = new Map();
-
-        this.initializeEventListeners(game, entityLayer, entityToSpriteMap);
+        this.initializeEventListeners(game, entityLayer);
 
         const removeEntitySprite = function() {
             entityLayer.remove(this)
@@ -55,20 +52,20 @@ class App extends Component {
         const badGuy = new Ship(500, 500, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
             game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy)
         });
-        entityToSpriteMap.set(badGuy, Sprites.makeModularEnemyDisplayable(badGuy, removeEntitySprite));
+        badGuy.sprite = Sprites.makeModularEnemyDisplayable(badGuy, removeEntitySprite);
 
         const badGuy2 = new Ship(600, 500, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
             game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy2)
         });
-        entityToSpriteMap.set(badGuy2, Sprites.makeModularEnemyDisplayable(badGuy2, removeEntitySprite));
+        badGuy2.sprite = Sprites.makeModularEnemyDisplayable(badGuy2, removeEntitySprite);
 
         const bigBadGuy = new Ship(550, 450, 50, 50, 0.3, 150, game.expireHostileShip, (x, y) => {
             game.spawnHostileProjectile(new Projectile(x + 21, y + 42, 8, 8, 6, 0, 1, ship => ship.damage(25)), bigBadGuy);
         });
-        entityToSpriteMap.set(bigBadGuy, Sprites.makeNewBigEnemyDisplayable(bigBadGuy, removeEntitySprite));
+        bigBadGuy.sprite = Sprites.makeNewBigEnemyDisplayable(bigBadGuy, removeEntitySprite);
 
         const playerEntity = game.getPlayer();
-        entityToSpriteMap.set(playerEntity, Sprites.makeModularPlayerDisplayable(playerEntity, removeEntitySprite));
+        playerEntity.sprite = Sprites.makeModularPlayerDisplayable(playerEntity, removeEntitySprite);
 
         game.spawnHostileShip(badGuy);
         game.spawnHostileShip(badGuy2);
@@ -131,13 +128,13 @@ class App extends Component {
         );
     }
 
-    initializeEventListeners(game, entityLayer, entityToSpriteMap) {
+    initializeEventListeners(game, entityLayer) {
         game.subscribeShipSpawned(ship => {
-            entityLayer.add(entityToSpriteMap.get(ship));
+            entityLayer.add(ship.sprite);
         });
 
         game.subscribeEntityExpired(entity => {
-            entityToSpriteMap.get(entity).explode();
+            entity.sprite.explode();
         });
 
         game.subscribeProjectileSpawned((projectile, source) => {
@@ -146,7 +143,7 @@ class App extends Component {
             });
 
             entityLayer.add(projectileDisplayable);
-            entityToSpriteMap.set(projectile, projectileDisplayable);
+            projectile.sprite = projectileDisplayable;
         });
     }
 
