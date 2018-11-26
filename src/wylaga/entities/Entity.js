@@ -1,3 +1,5 @@
+import UnitVector from "../../utils/UnitVector";
+
 export default class Entity {
     _x;
     _y;
@@ -23,12 +25,10 @@ export default class Entity {
         this._y += this._dy * this._velocity;
     };
 
-    setDx = dx => this._dx = dx;
-    setDy = dy => this._dy = dy;
-
     setTrajectory = (dx, dy) => {
-        this._dx = dx;
-        this._dy = dy;
+        const vector = new UnitVector(dx, dy);
+        this._dx = vector.getDx();
+        this._dy = vector.getDy();
     };
 
     setLocation = (x, y) => {

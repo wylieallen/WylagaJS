@@ -1,7 +1,6 @@
 export default class WaveController {
     constructor(entities) {
         this._entities = entities;
-        this._isBoosting = false;
     }
 
     update = () => {
@@ -10,11 +9,10 @@ export default class WaveController {
 
     updateEntity = entity => {
         entity.setFiring(Math.random() <= 0.01);
-        entity.setBoosting(this._isBoosting);
 
-        if(Math.random() <= 0.05)
+        if(Math.random() <= 0.02)
         {
-            this._isBoosting = !this._isBoosting;
+            entity.setBoosting(!entity.isBoosting);
         }
 
         if(Math.random() <= 0.05)

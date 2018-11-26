@@ -13,21 +13,27 @@ import TextDisplayable from "./displayables/primitives/TextDisplayable";
 import WaveController from "./wylaga/control/WaveController";
 import Projectile from "./wylaga/entities/Projectile";
 
-const WIDTH = 1600, HEIGHT = 900;
+export const WIDTH = 1600, HEIGHT = 900;
 
-class App extends Component {
+export default class App extends Component {
+    canvas = React.createRef();
     root;
-    canvas;
 
     game;
 
     playerController;
+    enemyController;
 
     constructor(props) {
         super(props);
         this.canvas = React.createRef();
 
-        // Initialize display tree:
+        const entityLayer = this.initializeDisplayTree();
+        this.initializeGame(entityLayer);
+        this.startTimer();
+    }
+
+    initializeDisplayTree = () => {
         const root = new CompositeDisplayable(0, 0);
         const entityLayer = new CompositeDisplayable(0, 0);
         const hudLayer = new CompositeDisplayable(0, 0);
@@ -39,94 +45,23 @@ class App extends Component {
         hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "SHIELD: " + this.game.getPlayer().getHealth()));
         hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "POWER: " + this.game.getPlayer().getCurrentFuel()));
 
-        // Initialize game:
+        this.root = root;
+
+        return entityLayer;
+    };
+
+    initializeGame = (entityLayer) => {
         this.game = new Game(WIDTH, HEIGHT);
-        const game = this.game;
 
-        this.initializeEventListeners(game, entityLayer);
+        this.initializeEventListeners(this.game, entityLayer);
 
-        const removeEntitySprite = function() {
+        const onExpire = function () {
             entityLayer.remove(this)
         };
 
-        const badGuy = new Ship(500, 500, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
-            game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy)
-        });
-        badGuy.sprite = Sprites.makeModularEnemyDisplayable(badGuy, removeEntitySprite);
-
-        const badGuy2 = new Ship(600, 500, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
-            game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy2)
-        });
-        badGuy2.sprite = Sprites.makeModularEnemyDisplayable(badGuy2, removeEntitySprite);
-
-        const bigBadGuy = new Ship(550, 450, 50, 50, 0.3, 150, game.expireHostileShip, (x, y) => {
-            game.spawnHostileProjectile(new Projectile(x + 21, y + 42, 8, 8, 6, 0, 1, ship => ship.damage(25)), bigBadGuy);
-        });
-        bigBadGuy.sprite = Sprites.makeNewBigEnemyDisplayable(bigBadGuy, removeEntitySprite);
-
-        const playerEntity = game.getPlayer();
-        playerEntity.sprite = Sprites.makeModularPlayerDisplayable(playerEntity, removeEntitySprite);
-
-        game.spawnHostileShip(badGuy);
-        game.spawnHostileShip(badGuy2);
-        game.spawnHostileShip(bigBadGuy);
-        game.spawnFriendlyShip(playerEntity);
-
-        this.game = game;
-        this.root = root;
-
-        this.initializeController(playerEntity);
-        this.initializeEnemyController([badGuy, badGuy2, bigBadGuy]);
-
-        this.startTimer();
-    }
-
-    timestamp = () => {
-        return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
+        this.initializePlayer(this.game, onExpire);
+        this.initializeEnemies(this.game, onExpire);
     };
-
-    now;
-    last;
-    dt;
-    carry;
-
-    startTimer = () => {
-        this.dt = 17;
-        this.carry = 0;
-        this.now = this.last = this.timestamp();
-        requestAnimationFrame(this.tick)
-    };
-
-    tick = () => {
-        this.now = this.timestamp();
-        let delta = (this.now - this.last) + this.carry;
-        if(delta > 1000) delta = 1000;
-
-        while(delta >= this.dt)
-        {
-            delta -= this.dt;
-            this.enemyController.update();
-            this.playerController.update();
-            this.canvas.current.update();
-            this.canvas.current.repaint();
-            this.game.update();
-        }
-
-        this.carry = delta;
-        this.last = this.now;
-
-        requestAnimationFrame(this.tick);
-    };
-
-    render() {
-        return (
-            <div className="App">
-                <header className="App-header">
-                    <DisplayCanvas width={WIDTH} height={HEIGHT} root={this.root} ref={this.canvas}/>
-                </header>
-            </div>
-        );
-    }
 
     initializeEventListeners(game, entityLayer) {
         game.subscribeShipSpawned(ship => {
@@ -147,9 +82,12 @@ class App extends Component {
         });
     }
 
-    initializeEnemyController(enemy) {
-        this.enemyController = new WaveController(enemy);
-    }
+    initializePlayer = (game, onExpire) => {
+        const entity = game.getPlayer();
+        entity.sprite = Sprites.makeModularPlayerDisplayable(entity, onExpire);
+        this.initializeController(entity);
+        game.spawnFriendlyShip(entity);
+    };
 
     initializeController(player) {
         const keyListener = new KeyListener();
@@ -208,6 +146,78 @@ class App extends Component {
         window.onkeydown = keyListener.keyPressed.bind(keyListener);
         window.onkeyup = keyListener.keyReleased.bind(keyListener);
     }
-}
 
-export default App;
+
+    initializeEnemies = (game, onExpire) => {
+        const badGuy = new Ship(825, 150, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
+            game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy)
+        });
+        badGuy.sprite = Sprites.makeModularEnemyDisplayable(badGuy, onExpire);
+
+        const badGuy2 = new Ship(750, 150, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
+            game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy2)
+        });
+        badGuy2.sprite = Sprites.makeModularEnemyDisplayable(badGuy2, onExpire);
+
+        const bigBadGuy = new Ship(775, 100, 50, 50, 0.3, 150, game.expireHostileShip, (x, y) => {
+            game.spawnHostileProjectile(new Projectile(x + 21, y + 42, 8, 8, 6, 0, 1, ship => ship.damage(25)), bigBadGuy);
+        });
+        bigBadGuy.sprite = Sprites.makeNewBigEnemyDisplayable(bigBadGuy, onExpire);
+
+        game.spawnHostileShip(badGuy);
+        game.spawnHostileShip(badGuy2);
+        game.spawnHostileShip(bigBadGuy);
+
+        this.initializeEnemyController([badGuy, badGuy2, bigBadGuy]);
+    };
+
+    initializeEnemyController(enemy) {
+        this.enemyController = new WaveController(enemy);
+    }
+
+    timestamp = () => {
+        return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
+    };
+
+    now;
+    last;
+    dt;
+    carry;
+
+    startTimer = () => {
+        this.dt = 17;
+        this.carry = 0;
+        this.now = this.last = this.timestamp();
+        requestAnimationFrame(this.tick)
+    };
+
+    tick = () => {
+        this.now = this.timestamp();
+        let delta = (this.now - this.last) + this.carry;
+        if (delta > 1000) delta = 1000;
+
+        while (delta >= this.dt) {
+            delta -= this.dt;
+            this.enemyController.update();
+            this.playerController.update();
+            this.canvas.current.update();
+            this.canvas.current.repaint();
+            this.game.update();
+        }
+
+        this.carry = delta;
+        this.last = this.now;
+
+        requestAnimationFrame(this.tick);
+    };
+
+    render() {
+        return (
+            <div className="App">
+                <header className="App-header">
+                    <DisplayCanvas width={WIDTH} height={HEIGHT} root={this.root} ref={this.canvas}/>
+                </header>
+            </div>
+        );
+    }
+}
