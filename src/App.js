@@ -3,7 +3,7 @@ import './App.css';
 import DisplayCanvas from './components/DisplayCanvas';
 import CompositeDisplayable from "./displayables/composites/CompositeDisplayable";
 import KeyListener from "./control/KeyListener";
-import KeyboardController from "./control/KeyboardController";
+import KeyboardController from "./wylaga/control/KeyboardController";
 
 import * as Sprites from "./wylaga/displayables/Sprites";
 import Starfield from "./wylaga/displayables/Starfield";
@@ -26,7 +26,6 @@ export default class App extends Component {
 
     constructor(props) {
         super(props);
-        this.canvas = React.createRef();
 
         const entityLayer = this.initializeDisplayTree();
         this.initializeGame(entityLayer);
@@ -34,18 +33,16 @@ export default class App extends Component {
     }
 
     initializeDisplayTree = () => {
-        const root = new CompositeDisplayable(0, 0);
+        this.root = new CompositeDisplayable(0, 0);
         const entityLayer = new CompositeDisplayable(0, 0);
         const hudLayer = new CompositeDisplayable(0, 0);
 
-        root.add(new Starfield(WIDTH, HEIGHT, 200));
-        root.add(entityLayer);
-        root.add(hudLayer);
+        this.root.add(new Starfield(WIDTH, HEIGHT, 200));
+        this.root.add(entityLayer);
+        this.root.add(hudLayer);
 
         hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "SHIELD: " + this.game.getPlayer().getHealth()));
         hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "POWER: " + this.game.getPlayer().getCurrentFuel()));
-
-        this.root = root;
 
         return entityLayer;
     };
@@ -148,18 +145,31 @@ export default class App extends Component {
     }
 
 
-    initializeEnemies = (game, onExpire) => {
-        const badGuy = new Ship(825, 150, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
+    initializeEnemies = (game, onExpire, x = 800, y = 125) => {
+
+        let baddies = [];
+
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 200, 200));
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 500, 175));
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 800, 125));
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 1100, 175));
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 1400, 200));
+
+        this.initializeEnemyController(baddies);
+    };
+
+    initializeWing = (game, onExpire, x = 800, y = 125) => {
+        const badGuy = new Ship(x + 25, y + 25, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
             game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy)
         });
         badGuy.sprite = Sprites.makeModularEnemyDisplayable(badGuy, onExpire);
 
-        const badGuy2 = new Ship(750, 150, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
+        const badGuy2 = new Ship(x - 50, y + 25, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
             game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy2)
         });
         badGuy2.sprite = Sprites.makeModularEnemyDisplayable(badGuy2, onExpire);
 
-        const bigBadGuy = new Ship(775, 100, 50, 50, 0.3, 150, game.expireHostileShip, (x, y) => {
+        const bigBadGuy = new Ship(x - 25, y - 25, 50, 50, 0.3, 150, game.expireHostileShip, (x, y) => {
             game.spawnHostileProjectile(new Projectile(x + 21, y + 42, 8, 8, 6, 0, 1, ship => ship.damage(25)), bigBadGuy);
         });
         bigBadGuy.sprite = Sprites.makeNewBigEnemyDisplayable(bigBadGuy, onExpire);
@@ -168,11 +178,11 @@ export default class App extends Component {
         game.spawnHostileShip(badGuy2);
         game.spawnHostileShip(bigBadGuy);
 
-        this.initializeEnemyController([badGuy, badGuy2, bigBadGuy]);
+        return [badGuy, badGuy2, bigBadGuy];
     };
 
     initializeEnemyController(enemy) {
-        this.enemyController = new WaveController(enemy);
+        this.enemyController = new WaveController(enemy, WIDTH, HEIGHT);
     }
 
     timestamp = () => {
