@@ -1,32 +1,22 @@
 export default class EntityDisplayable {
-    _entity;
-    _sprite;
-
     constructor(entity, sprite, explode, expire)
     {
-        this._entity = entity;
-        this._sprite = sprite;
-
-        this.getX = this._entity.getX;
-        this.getY = this._entity.getY;
+        this.getX = entity.getX;
+        this.getY = entity.getY;
 
         this.explode = explode;
         this.expire = expire;
+
+        this.setSprite = _sprite => sprite = _sprite;
+        this.getSprite = () => sprite;
+        this.getEntity = () => entity;
+
+        this.update = () => sprite.update();
+        this.display = ctx => {
+            ctx.save();
+            ctx.translate(this.getX(), this.getY());
+            sprite.display(ctx);
+            ctx.restore();
+        }
     }
-
-    update = () => {
-        this._sprite.update();
-    };
-
-    setSprite = sprite => this._sprite = sprite;
-    getSprite = () => this._sprite;
-
-    getEntity = () => this._entity;
-
-    display = ctx => {
-        ctx.save();
-        ctx.translate(this.getX(), this.getY());
-        this._sprite.display(ctx);
-        ctx.restore();
-    };
 }

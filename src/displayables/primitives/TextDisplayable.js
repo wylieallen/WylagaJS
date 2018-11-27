@@ -1,7 +1,6 @@
 import Displayable from "../Displayable";
 
 export default class TextDisplayable extends Displayable {
-    _color;
 
     constructor(x, y, color, getString, font = "16px Arial", onUpdate = () => {})
     {
@@ -14,9 +13,7 @@ export default class TextDisplayable extends Displayable {
                 },
             onUpdate
         );
-        this._color = color;
+        this.getColor = () => color;
         this.getString = getString;
     }
-
-    getColor = () => this._color;
 }

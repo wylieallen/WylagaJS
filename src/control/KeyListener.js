@@ -1,32 +1,31 @@
 export default class KeyListener {
-    _pressMap = {};
-    _releaseMap = {};
-    _actionMap = {};
 
-    bindKeyPress(keyCode, action)
-    {
-        this._pressMap[keyCode] = action;
-    }
+    constructor() {
 
-    bindKeyRelease(keyCode, action)
-    {
-        this._releaseMap[keyCode] = action;
-    }
+        const pressMap = {},
+            releaseMap = {},
+            actionMap = {};
 
-    bindAction(action, fn)
-    {
-        this._actionMap[action] = fn;
-    }
+        this.bindKeyPress = (keyCode, action) => {
+            pressMap[keyCode] = action;
+        };
 
-    keyPressed(e)
-    {
-        const fn = this._actionMap[this._pressMap[e.keyCode.toString()]];
-        if(fn) fn();
-    }
+        this.bindKeyRelease = (keyCode, action) => {
+            releaseMap[keyCode] = action;
+        };
 
-    keyReleased(e)
-    {
-        const fn = this._actionMap[this._releaseMap[e.keyCode.toString()]];
-        if(fn) fn();
+        this.bindAction = (action, fn) => {
+            actionMap[action] = fn;
+        };
+
+        this.keyPressed = e => {
+            const fn = actionMap[pressMap[e.keyCode.toString()]];
+            if(fn) { fn(); }
+        };
+
+        this.keyReleased = e => {
+            const fn = actionMap[releaseMap[e.keyCode.toString()]];
+            if(fn) { fn(); }
+        }
     }
 }
