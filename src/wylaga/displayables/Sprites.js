@@ -66,6 +66,14 @@ export function makeProjectileDisplayable(projectile, onExpire) {
     return displayable;
 }
 
+function makeBigEnemyExplosion(entity, onExpire) {
+    return makeNewExplosion(entity, 100, "#0f0", 100, onExpire);
+}
+
+function makeSmallEnemyExplosion(entity, onExpire) {
+    return makeNewExplosion(entity, 70, "#0f0", 80, onExpire);
+}
+
 function makeNewPlayerExplosion(entity, onExpire) {
     return makeNewExplosion(entity, 100, "#f00", 100, onExpire);
 }
@@ -170,7 +178,7 @@ function makeModularWeaponDisplayable(entity, x, y, baseImage, firingImage, dura
 }
 
 export function makeModularEnemyDisplayable(entity, onExpire) {
-    const explosion = makeNewPlayerExplosion(entity, onExpire);
+    const explosion = makeSmallEnemyExplosion(entity, onExpire);
     const explode = function() {
         explosion.centerOn(entity);
         this.setSprite(explosion);
@@ -203,7 +211,7 @@ function makeEnemySpecialDisplayable(entity) {
 }
 
 export function makeNewBigEnemyDisplayable(entity, onExpire) {
-    const explosion = makeNewPlayerExplosion(entity, onExpire);
+    const explosion = makeBigEnemyExplosion(entity, onExpire);
     const explode = function() {
         explosion.centerOn(entity);
         this.setSprite(explosion);
