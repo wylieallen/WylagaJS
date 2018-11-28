@@ -216,17 +216,32 @@ export function makeNewBigEnemyDisplayable(entity, onExpire) {
         explosion.centerOn(entity);
         this.setSprite(explosion);
     };
-    const displayable = new ShipDisplayable(entity, makeImageDisplayable(Images.BIG_ENEMY_BASE), explode, onExpire,
-        () => {},
-        () => {
-            displayable.setSprite(new LinearAnimation(0, 0, [Images.BIG_ENEMY_HURT], 3,
-                () => displayable.setSprite(makeImageDisplayable(Images.BIG_ENEMY_BASE))));
-        },
-        () => {},
-        () => {},
-        () => {});
 
-    return displayable;
+    const chassis = makeBigEnemyChassis(entity);
+    const special = makeBigEnemySpecial(entity);
+    const engine = makeBigEnemyEngine(entity);
+    const weapon = makeBigEnemyWeapon(entity);
+
+    return new ModularShipDisplayable(entity, explode, onExpire, chassis, weapon, engine, special);
+}
+
+function makeBigEnemyChassis(entity) {
+    return makeModularBodyDisplayable(entity, Images.BIG_ENEMY_CHASSIS_BASE, Images.BIG_ENEMY_CHASSIS_HURT, Images.BIG_ENEMY_CHASSIS_DIRE);
+}
+
+function makeBigEnemySpecial(entity) {
+    return makeModularSpecialDisplayable(entity, 0, 0, Images.BIG_ENEMY_SPECIAL_BASE, Images.BIG_ENEMY_SPECIAL_DEPLOYED);
+}
+
+function makeBigEnemyEngine(entity) {
+    const up = makeImageDisplayable(Images.BIG_ENEMY_ENGINE_BRAKE);
+    const down = new CircularAnimation(0, 0, [Images.BIG_ENEMY_ENGINE_BOOST, Images.BIG_ENEMY_ENGINE_BOOST_2], 10);
+    const neutral = new CircularAnimation(0, 0, [Images.BIG_ENEMY_ENGINE_BASE, Images.BIG_ENEMY_ENGINE_BASE_2], 40);
+    return makeModularEngineDisplayable(entity, 0, 0, up, down, neutral);
+}
+
+function makeBigEnemyWeapon(entity) {
+    return makeModularWeaponDisplayable(entity, 0, 0, Images.BIG_ENEMY_WEAPON_BASE, Images.BIG_ENEMY_WEAPON_FIRING);
 }
 
 class Particle extends SolidRect {

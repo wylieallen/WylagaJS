@@ -20,6 +20,22 @@ import PlayerFiringWeapon from "./player/PlayerFiringWeapon.png";
 import BigEnemyBase from "./bigenemy/BaseBigEnemy.png";
 import BigEnemyHurt from "./bigenemy/HurtBigEnemy.png";
 
+import BigEnemyBaseChassis from "./bigenemy/BigEnemyChassisBase.png";
+import BigEnemyHurtChassis from "./bigenemy/BigEnemyChassisHurt.png";
+import BigEnemyNearDeathChassis from "./bigenemy/BigEnemyChassisNearDeath.png";
+
+import BigEnemyBaseSpecial from "./bigenemy/BigEnemySpecialBase.png";
+import BigEnemyDeployedSpecial from "./bigenemy/BigEnemySpecialDeployed.png";
+
+import BigEnemyBaseEngine from "./bigenemy/BigEnemyEngineBase.png";
+import BigEnemyBaseEngine2 from "./bigenemy/BigEnemyEngineBase2.png";
+import BigEnemyBrakeEngine from "./bigenemy/BigEnemyEngineBrake.png";
+import BigEnemyBoostEngine from "./bigenemy/BigEnemyEngineBoost.png";
+import BigEnemyBoostEngine2 from "./bigenemy/BigEnemyEngineBoost2.png";
+
+import BigEnemyBaseWeapon from "./bigenemy/BigEnemyWeaponBase.png";
+import BigEnemyFiringWeapon from "./bigenemy/BigEnemyWeaponFiring.png";
+
 import EnemyBaseChassis from "./enemy/EnemyBaseChassis.png";
 import EnemyHurtChassis from "./enemy/EnemyHurtChassis.png";
 import EnemyNearDeathChassis from "./enemy/EnemyNearDeathChassis.png";
@@ -59,6 +75,22 @@ export const PLAYER_WEAPON_FIRE = makeImage(PlayerFiringWeapon);
 // Big enemy sprite components:
 export const BIG_ENEMY_BASE = makeImage(BigEnemyBase);
 export const BIG_ENEMY_HURT = makeImage(BigEnemyHurt);
+
+export const BIG_ENEMY_CHASSIS_BASE = makeImage(BigEnemyBaseChassis);
+export const BIG_ENEMY_CHASSIS_HURT = makeImage(BigEnemyHurtChassis);
+export const BIG_ENEMY_CHASSIS_DIRE = makeImage(BigEnemyNearDeathChassis);
+
+export const BIG_ENEMY_SPECIAL_BASE = makeImage(BigEnemyBaseSpecial);
+export const BIG_ENEMY_SPECIAL_DEPLOYED = makeImage(BigEnemyDeployedSpecial);
+
+export const BIG_ENEMY_ENGINE_BASE = makeImage(BigEnemyBaseEngine);
+export const BIG_ENEMY_ENGINE_BASE_2 = makeImage(BigEnemyBaseEngine2);
+export const BIG_ENEMY_ENGINE_BRAKE = makeImage(BigEnemyBrakeEngine);
+export const BIG_ENEMY_ENGINE_BOOST = makeImage(BigEnemyBoostEngine);
+export const BIG_ENEMY_ENGINE_BOOST_2 = makeImage(BigEnemyBoostEngine2);
+
+export const BIG_ENEMY_WEAPON_BASE = makeImage(BigEnemyBaseWeapon);
+export const BIG_ENEMY_WEAPON_FIRING = makeImage(BigEnemyFiringWeapon);
 
 // Enemy sprite components:
 export const ENEMY_CHASSIS_BASE = makeImage(EnemyBaseChassis);
