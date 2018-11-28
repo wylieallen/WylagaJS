@@ -24,8 +24,12 @@ export default class App extends Component {
     playerController;
     enemyController;
 
+    sourcesToSpriteMakers;
+
     constructor(props) {
         super(props);
+
+        this.sourcesToSpriteMakers = new Map();
 
         const entityLayer = this.initializeDisplayTree();
         this.initializeGame(entityLayer);
@@ -70,18 +74,21 @@ export default class App extends Component {
         });
 
         game.subscribeProjectileSpawned((projectile, source) => {
-            const projectileDisplayable = Sprites.makeProjectileDisplayable(projectile, () => {
-                entityLayer.remove(projectileDisplayable);
-            });
+            const projectileDisplayable = this.makeProjectileDisplayable(projectile, source, () => entityLayer.remove(projectileDisplayable));
 
             entityLayer.add(projectileDisplayable);
             projectile.sprite = projectileDisplayable;
         });
     }
 
+    makeProjectileDisplayable = (projectile, source, onExpire) => {
+        return this.sourcesToSpriteMakers.get(source)(projectile, onExpire);//Sprites.makeProjectileDisplayable(projectile, onExpire);
+    };
+
     initializePlayer = (game, onExpire) => {
         const entity = game.getPlayer();
         entity.sprite = Sprites.makeModularPlayerDisplayable(entity, onExpire);
+        this.sourcesToSpriteMakers.set(entity, Sprites.makeProjectileDisplayable);
         this.initializeController(entity);
         game.spawnFriendlyShip(entity);
     };
@@ -163,16 +170,19 @@ export default class App extends Component {
             game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy)
         });
         badGuy.sprite = Sprites.makeModularEnemyDisplayable(badGuy, onExpire);
+        this.sourcesToSpriteMakers.set(badGuy, Sprites.makeSmallEnemyProjectile);
 
         const badGuy2 = new Ship(x - 50, y + 25, 25, 25, 1, 60, game.expireHostileShip, (x, y) => {
             game.spawnHostileProjectile(new Projectile(x + 9, y + 25, 7, 7, 12, 0, 1, ship => ship.damage(10)), badGuy2)
         });
         badGuy2.sprite = Sprites.makeModularEnemyDisplayable(badGuy2, onExpire);
+        this.sourcesToSpriteMakers.set(badGuy2, Sprites.makeSmallEnemyProjectile);
 
         const bigBadGuy = new Ship(x - 25, y - 25, 50, 50, 0.3, 150, game.expireHostileShip, (x, y) => {
             game.spawnHostileProjectile(new Projectile(x + 21, y + 42, 8, 8, 6, 0, 1, ship => ship.damage(25)), bigBadGuy);
         });
         bigBadGuy.sprite = Sprites.makeNewBigEnemyDisplayable(bigBadGuy, onExpire);
+        this.sourcesToSpriteMakers.set(bigBadGuy, Sprites.makeBigEnemyProjectile);
 
         game.spawnHostileShip(badGuy);
         game.spawnHostileShip(badGuy2);

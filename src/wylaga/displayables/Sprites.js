@@ -26,7 +26,31 @@ export function makeModularPlayerDisplayable(entity, onExpire) {
     return new ModularShipDisplayable(entity, explode, onExpire, body, weapon, engine, special);
 }
 
-export function makeProjectileDisplayable(projectile, onExpire){
+export function makeSmallEnemyProjectile(projectile, onExpire) {
+    const sprite = new SolidRect(0, 0, projectile.getWidth(), projectile.getHeight(), '#0F0');
+    const explosion = makeNewExplosion(projectile, 50, "#0F0", 70, onExpire);
+    const explode = function() {
+        explosion.centerOn(projectile);
+        this.setSprite(explosion);
+    };
+    const displayable = new EntityDisplayable(projectile, sprite, explode, onExpire);
+
+    return displayable;
+}
+
+export function makeBigEnemyProjectile(projectile, onExpire) {
+    const sprite = new SolidRect(0, 0, projectile.getWidth(), projectile.getHeight(), '#0F0');
+    const explosion = makeNewExplosion(projectile, 50, "#0F0", 70, onExpire);
+    const explode = function() {
+        explosion.centerOn(projectile);
+        this.setSprite(explosion);
+    };
+    const displayable = new EntityDisplayable(projectile, sprite, explode, onExpire);
+
+    return displayable;
+}
+
+export function makeProjectileDisplayable(projectile, onExpire) {
     const sprite = new SolidRect(0, 0,
         projectile.getWidth(), projectile.getHeight(), '#FF0000');
 
