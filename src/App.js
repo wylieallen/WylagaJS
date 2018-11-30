@@ -8,6 +8,7 @@ import KeyboardController from "./wylaga/control/KeyboardController";
 import * as Sprites from "./wylaga/displayables/Sprites";
 import Starfield from "./wylaga/displayables/Starfield";
 import Game from "./wylaga/Game";
+import Model from "./wylaga/Model";
 import Ship from "./wylaga/entities/Ship";
 import TextDisplayable from "./displayables/primitives/TextDisplayable";
 import WaveController from "./wylaga/control/WaveController";
@@ -45,14 +46,15 @@ export default class App extends Component {
         this.root.add(entityLayer);
         this.root.add(hudLayer);
 
-        hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "SHIELD: " + this.game.getPlayer().getHealth()));
-        hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "POWER: " + this.game.getPlayer().getCurrentFuel()));
+        // hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "SHIELD: " + this.game.getPlayer().getHealth()));
+        // hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "POWER: " + this.game.getPlayer().getCurrentFuel()));
 
         return entityLayer;
     };
 
     initializeGame = (entityLayer) => {
-        this.game = new Game(WIDTH, HEIGHT);
+        // this.game = new Game(WIDTH, HEIGHT);
+        this.game = new Model(WIDTH, HEIGHT);
 
         this.initializeEventListeners(this.game, entityLayer);
 
@@ -86,7 +88,10 @@ export default class App extends Component {
     };
 
     initializePlayer = (game, onExpire) => {
-        const entity = game.getPlayer();
+        const entity = new Ship((WIDTH / 2) - (25), (3 * HEIGHT / 4) - (25), 50, 50, 3, 100, game.expireFriendlyShip,
+            (x, y) => game.spawnFriendlyProjectile(new Projectile(x + 23, y - 5 - 2, 4, 15, 9, 0, -1, ship => ship.damage(10)), entity)
+        );
+            // game.getPlayer(); // todo: instead, make and inject player
         entity.sprite = Sprites.makeModularPlayerDisplayable(entity, onExpire);
         this.sourcesToSpriteMakers.set(entity, Sprites.makeProjectileDisplayable);
         this.initializeController(entity);
