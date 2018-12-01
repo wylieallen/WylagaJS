@@ -4,10 +4,8 @@ import CompositeDisplayable from "../../displayables/composites/CompositeDisplay
 import UnitVector from "../../utils/UnitVector";
 import SolidRect from "../../displayables/primitives/SolidRect";
 import CircularAnimation from "../../displayables/primitives/CircularAnimation";
-import LinearAnimation from "../../displayables/primitives/LinearAnimation";
 import ModularShipDisplayable from "./ModularShipDisplayable";
 import EntityDisplayable from "./EntityDisplayable";
-import ShipDisplayable from "./ShipDisplayable";
 
 
 export function makeModularPlayerDisplayable(entity, onExpire) {

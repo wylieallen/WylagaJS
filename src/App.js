@@ -3,7 +3,7 @@ import './App.css';
 import DisplayCanvas from './components/DisplayCanvas';
 import CompositeDisplayable from "./displayables/composites/CompositeDisplayable";
 import KeyListener from "./control/KeyListener";
-import KeyboardController from "./wylaga/control/KeyboardController";
+import KeyboardController from "./wylaga/control/player/KeyboardController";
 
 import * as Sprites from "./wylaga/displayables/Sprites";
 import Starfield from "./wylaga/displayables/Starfield";
@@ -12,6 +12,8 @@ import Ship from "./wylaga/entities/Ship";
 import HostileController from "./wylaga/control/HostileController";
 import Projectile from "./wylaga/entities/Projectile";
 import TextDisplayable from "./displayables/primitives/TextDisplayable";
+import StageController from "./wylaga/control/StageController";
+import Stage from "./wylaga/control/Stage";
 
 export const WIDTH = 1600, HEIGHT = 900;
 
@@ -66,7 +68,9 @@ export default class App extends Component {
         };
 
         this.initializePlayer(player, this.game, onExpire);
-        this.initializeEnemies(this.game, onExpire);
+        const stage = this.initializeEnemies(this.game, onExpire);
+        this.enemyController = new StageController(WIDTH, HEIGHT, game, () => console.log("Stage Complete!"));
+        this.enemyController.setStage(stage);
     };
 
     initializeEventListeners(game, entityLayer) {
@@ -166,7 +170,7 @@ export default class App extends Component {
         baddies = baddies.concat(this.initializeWing(game, onExpire, 1100, 175));
         baddies = baddies.concat(this.initializeWing(game, onExpire, 1400, 200));
 
-        this.initializeEnemyController(baddies);
+        return new Stage([baddies]);
     };
 
     initializeWing = (game, onExpire, x = 800, y = 125) => {
@@ -194,10 +198,6 @@ export default class App extends Component {
 
         return [badGuy, badGuy2, bigBadGuy];
     };
-
-    initializeEnemyController(enemy) {
-        this.enemyController = new HostileController(enemy, WIDTH, HEIGHT);
-    }
 
     timestamp = () => {
         return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
