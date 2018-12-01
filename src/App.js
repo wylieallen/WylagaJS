@@ -9,8 +9,9 @@ import * as Sprites from "./wylaga/displayables/Sprites";
 import Starfield from "./wylaga/displayables/Starfield";
 import Model from "./wylaga/Model";
 import Ship from "./wylaga/entities/Ship";
-import WaveController from "./wylaga/control/WaveController";
+import HostileController from "./wylaga/control/HostileController";
 import Projectile from "./wylaga/entities/Projectile";
+import TextDisplayable from "./displayables/primitives/TextDisplayable";
 
 export const WIDTH = 1600, HEIGHT = 900;
 
@@ -30,12 +31,17 @@ export default class App extends Component {
 
         this.sourcesToSpriteMakers = new Map();
 
-        const entityLayer = this.initializeDisplayTree();
-        this.initializeGame(entityLayer);
+        const game = new Model(WIDTH, HEIGHT);
+        const player = new Ship((WIDTH / 2) - (25), (3 * HEIGHT / 4) - (25), 50, 50, 3, 100, game.expireFriendlyShip,
+            (x, y) => game.spawnFriendlyProjectile(new Projectile(x + 23, y - 5 - 2, 4, 15, 9, 0, -1, ship => ship.damage(10)), player)
+        );
+
+        const entityLayer = this.initializeDisplayTree(player);
+        this.initializeGame(player, game, entityLayer);
         this.startTimer();
     }
 
-    initializeDisplayTree = () => {
+    initializeDisplayTree = (player) => {
         this.root = new CompositeDisplayable(0, 0);
         const entityLayer = new CompositeDisplayable(0, 0);
         const hudLayer = new CompositeDisplayable(0, 0);
@@ -44,14 +50,14 @@ export default class App extends Component {
         this.root.add(entityLayer);
         this.root.add(hudLayer);
 
-        // hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "SHIELD: " + this.game.getPlayer().getHealth()));
-        // hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "POWER: " + this.game.getPlayer().getCurrentFuel()));
+        hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "SHIELD: " + player.getHealth()));
+        hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "POWER: " + player.getCurrentFuel()));
 
         return entityLayer;
     };
 
-    initializeGame = (entityLayer) => {
-        this.game = new Model(WIDTH, HEIGHT);
+    initializeGame = (player, game, entityLayer) => {
+        this.game = game;
 
         this.initializeEventListeners(this.game, entityLayer);
 
@@ -59,7 +65,7 @@ export default class App extends Component {
             entityLayer.remove(this)
         };
 
-        this.initializePlayer(this.game, onExpire);
+        this.initializePlayer(player, this.game, onExpire);
         this.initializeEnemies(this.game, onExpire);
     };
 
@@ -84,11 +90,7 @@ export default class App extends Component {
         return this.sourcesToSpriteMakers.get(source)(projectile, onExpire);//Sprites.makeProjectileDisplayable(projectile, onExpire);
     };
 
-    initializePlayer = (game, onExpire) => {
-        const entity = new Ship((WIDTH / 2) - (25), (3 * HEIGHT / 4) - (25), 50, 50, 3, 100, game.expireFriendlyShip,
-            (x, y) => game.spawnFriendlyProjectile(new Projectile(x + 23, y - 5 - 2, 4, 15, 9, 0, -1, ship => ship.damage(10)), entity)
-        );
-            // game.getPlayer(); // todo: instead, make and inject player
+    initializePlayer = (entity, game, onExpire) => {
         entity.sprite = Sprites.makeModularPlayerDisplayable(entity, onExpire);
         this.sourcesToSpriteMakers.set(entity, Sprites.makeProjectileDisplayable);
         this.initializeController(entity);
@@ -194,7 +196,7 @@ export default class App extends Component {
     };
 
     initializeEnemyController(enemy) {
-        this.enemyController = new WaveController(enemy, WIDTH, HEIGHT);
+        this.enemyController = new HostileController(enemy, WIDTH, HEIGHT);
     }
 
     timestamp = () => {

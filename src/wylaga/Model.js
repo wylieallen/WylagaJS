@@ -8,10 +8,11 @@ export default class Model {
         const friendlyShips = new Set(), friendlyProjectiles = new Set(),
             hostileShips = new Set(), hostileProjectiles = new Set();
 
+        const allEntities = [friendlyShips, friendlyProjectiles, hostileShips, hostileProjectiles];
+
         const expiredFriendlyShips = new Set(), expiredFriendlyProjectiles = new Set(),
             expiredHostileShips = new Set(), expiredHostileProjectiles = new Set();
 
-        const allEntities = [friendlyShips, friendlyProjectiles, hostileShips, hostileProjectiles];
         const expireds = [expiredFriendlyShips, expiredFriendlyProjectiles, expiredHostileShips, expiredHostileProjectiles];
 
         // Lifecycle event listeners:
@@ -31,19 +32,11 @@ export default class Model {
         // Collision event listeners:
         const processCollisions = initializeEntityCollider.bind(this)(friendlyShips, friendlyProjectiles, hostileShips, hostileProjectiles);
 
-
-        const updateEntities = () => {
-            allEntities.forEach(list => list.forEach(e => e.update()));
-        };
+        const updateEntities = () => allEntities.forEach(list => list.forEach(e => e.update()));
 
         this.update = () => {
-            // purge expireds
             removeExpiredEntities();
-
-            // update entities
             updateEntities();
-
-            // check for collisions
             processCollisions();
         };
 
@@ -111,6 +104,8 @@ function initializeLifecycleMethods(friendlyShips, friendlyProjectiles,
 
 function initializeEntityCollider(friendlyShips, friendlyProjectiles,
                                   hostileShips, hostileProjectiles) {
+
+    // Initialize collision event listeners and associated methods:
     const shipToShipCollisionListeners = [];
     const hostileProjectileCollisionListeners = [];
     const friendlyProjectileCollisionListeners = [];
@@ -150,11 +145,9 @@ function initializeEntityCollider(friendlyShips, friendlyProjectiles,
     friendlyShipPrimaryGroup.addSecondaryGroup(hostileShipSecondaryGroup);
     friendlyShipPrimaryGroup.addSecondaryGroup(hostileProjectileSecondaryGroup);
 
-
     const hostileShipPrimaryGroup = new PrimaryGroup(hostileShips);
     const friendlyProjectileSecondaryGroup = new SecondaryGroup(friendlyProjectiles, friendlyProjectileCollision);
     hostileShipPrimaryGroup.addSecondaryGroup(friendlyProjectileSecondaryGroup);
-
 
     const collider = new EntityCollider();
 

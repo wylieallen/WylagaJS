@@ -1,6 +1,4 @@
 export default class KeyboardController {
-    _entity;
-
     upPressed = false;
     downPressed = false;
     leftPressed = false;
@@ -9,7 +7,14 @@ export default class KeyboardController {
     isBoosting = false;
 
     constructor(entity) {
-        this._entity = entity;
+        this.update = () => {
+            entity.setTrajectory(
+                KeyboardController.getSign(this.rightPressed, this.leftPressed),
+                KeyboardController.getSign(this.downPressed, this.upPressed)
+            );
+            entity.setFiring(this.isFiring);
+            entity.setBoosting(this.isBoosting);
+        }
     }
 
     static getSign = (pos, neg) =>
@@ -27,12 +32,4 @@ export default class KeyboardController {
             return -1;
         }
     };
-
-    update = () => {
-        const dx = KeyboardController.getSign(this.rightPressed, this.leftPressed);
-        const dy = KeyboardController.getSign(this.downPressed, this.upPressed);
-        this._entity.setTrajectory(dx, dy);
-        this._entity.setFiring(this.isFiring);
-        this._entity.setBoosting(this.isBoosting);
-    }
 }
