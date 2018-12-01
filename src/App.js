@@ -7,10 +7,8 @@ import KeyboardController from "./wylaga/control/KeyboardController";
 
 import * as Sprites from "./wylaga/displayables/Sprites";
 import Starfield from "./wylaga/displayables/Starfield";
-import Game from "./wylaga/Game";
 import Model from "./wylaga/Model";
 import Ship from "./wylaga/entities/Ship";
-import TextDisplayable from "./displayables/primitives/TextDisplayable";
 import WaveController from "./wylaga/control/WaveController";
 import Projectile from "./wylaga/entities/Projectile";
 
@@ -53,7 +51,6 @@ export default class App extends Component {
     };
 
     initializeGame = (entityLayer) => {
-        // this.game = new Game(WIDTH, HEIGHT);
         this.game = new Model(WIDTH, HEIGHT);
 
         this.initializeEventListeners(this.game, entityLayer);

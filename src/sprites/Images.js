@@ -1,6 +1,3 @@
-import Enemy from "./Enemy.png";
-import HurtEnemy from "./HurtEnemy.png";
-
 import PlayerBaseChassis from "./player/PlayerBaseChassis.png";
 import PlayerHurtChassis from "./player/PlayerHurtChassis.png";
 import PlayerNearDeathChassis from "./player/PlayerNearDeathChassis.png";
@@ -16,9 +13,6 @@ import PlayerBrakeEngine from "./player/PlayerBrakeEngine.png";
 
 import PlayerBaseWeapon from "./player/PlayerBaseWeapon.png";
 import PlayerFiringWeapon from "./player/PlayerFiringWeapon.png";
-
-import BigEnemyBase from "./bigenemy/BaseBigEnemy.png";
-import BigEnemyHurt from "./bigenemy/HurtBigEnemy.png";
 
 import BigEnemyBaseChassis from "./bigenemy/BigEnemyChassisBase.png";
 import BigEnemyHurtChassis from "./bigenemy/BigEnemyChassisHurt.png";
@@ -73,9 +67,6 @@ export const PLAYER_WEAPON_BASE = makeImage(PlayerBaseWeapon);
 export const PLAYER_WEAPON_FIRE = makeImage(PlayerFiringWeapon);
 
 // Big enemy sprite components:
-export const BIG_ENEMY_BASE = makeImage(BigEnemyBase);
-export const BIG_ENEMY_HURT = makeImage(BigEnemyHurt);
-
 export const BIG_ENEMY_CHASSIS_BASE = makeImage(BigEnemyBaseChassis);
 export const BIG_ENEMY_CHASSIS_HURT = makeImage(BigEnemyHurtChassis);
 export const BIG_ENEMY_CHASSIS_DIRE = makeImage(BigEnemyNearDeathChassis);
@@ -105,6 +96,3 @@ export const ENEMY_ENGINE_BOOST = makeImage(EnemyBoostEngine);
 
 export const ENEMY_SPECIAL_BASE = makeImage(EnemyBaseSpecial);
 export const ENEMY_SPECIAL_DEPLOYED = makeImage(EnemyDeployedSpecial);
-
-export const enemy = makeImage(Enemy);
-export const hurtEnemy = makeImage(HurtEnemy);
