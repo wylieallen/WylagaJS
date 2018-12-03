@@ -105,7 +105,7 @@ function initializeLifecycleMethods(friendlyShips, friendlyProjectiles,
 function initializeEntityCollider(friendlyShips, friendlyProjectiles,
                                   hostileShips, hostileProjectiles) {
 
-    // Initialize collision event listeners and associated methods:
+    // Initialize collision event listeners and subscription interface:
     const shipToShipCollisionListeners = [];
     const hostileProjectileCollisionListeners = [];
     const friendlyProjectileCollisionListeners = [];

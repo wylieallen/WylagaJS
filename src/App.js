@@ -9,10 +9,9 @@ import * as Sprites from "./wylaga/displayables/Sprites";
 import Starfield from "./wylaga/displayables/Starfield";
 import Model from "./wylaga/Model";
 import Ship from "./wylaga/entities/Ship";
-import HostileController from "./wylaga/control/HostileController";
 import Projectile from "./wylaga/entities/Projectile";
 import TextDisplayable from "./displayables/primitives/TextDisplayable";
-import StageController from "./wylaga/control/StageController";
+import StageController from "./wylaga/control/npc/StageController";
 import Stage from "./wylaga/control/Stage";
 
 export const WIDTH = 1600, HEIGHT = 900;
@@ -35,11 +34,11 @@ export default class App extends Component {
 
         const game = new Model(WIDTH, HEIGHT);
         const player = new Ship((WIDTH / 2) - (25), (3 * HEIGHT / 4) - (25), 50, 50, 3, 100, game.expireFriendlyShip,
-            (x, y) => game.spawnFriendlyProjectile(new Projectile(x + 23, y - 5 - 2, 4, 15, 9, 0, -1, ship => ship.damage(10)), player)
+            (x, y) => game.spawnFriendlyProjectile(new Projectile(x + 23, y - 5 - 2, 4, 15, 9, 0, -1, ship => ship.damage(1000)), player)
         );
 
-        const entityLayer = this.initializeDisplayTree(player);
-        this.initializeGame(player, game, entityLayer);
+        this.initializeDisplayTree(player);
+        this.initializeGame(player, game);
         this.startTimer();
     }
 
@@ -55,27 +54,31 @@ export default class App extends Component {
         hudLayer.add(new TextDisplayable(40, 40, "#FFF", () => "SHIELD: " + player.getHealth()));
         hudLayer.add(new TextDisplayable(40, 60, "#FFF", () => "POWER: " + player.getCurrentFuel()));
 
-        return entityLayer;
+        this.addToEntityLayer = sprite => entityLayer.add(sprite);
+        this.removeFromEntityLayer = sprite => entityLayer.remove(sprite);
     };
 
-    initializeGame = (player, game, entityLayer) => {
+    initializeGame = (player, game) => {
         this.game = game;
 
-        this.initializeEventListeners(this.game, entityLayer);
+        this.initializeEventListeners(this.game);
+
+        const removeFromEntityLayer = this.removeFromEntityLayer;
 
         const onExpire = function () {
-            entityLayer.remove(this)
+            removeFromEntityLayer(this);
         };
 
         this.initializePlayer(player, this.game, onExpire);
         const stage = this.initializeEnemies(this.game, onExpire);
-        this.enemyController = new StageController(WIDTH, HEIGHT, game, () => console.log("Stage Complete!"));
+        this.enemyController = new StageController(WIDTH, HEIGHT, game,
+            () => this.enemyController.setStage(this.initializeEnemies(this.game, onExpire)));
         this.enemyController.setStage(stage);
     };
 
-    initializeEventListeners(game, entityLayer) {
+    initializeEventListeners(game) {
         game.subscribeShipSpawned(ship => {
-            entityLayer.add(ship.sprite);
+            this.addToEntityLayer(ship.sprite);
         });
 
         game.subscribeEntityExpired(entity => {
@@ -83,15 +86,15 @@ export default class App extends Component {
         });
 
         game.subscribeProjectileSpawned((projectile, source) => {
-            const projectileDisplayable = this.makeProjectileDisplayable(projectile, source, () => entityLayer.remove(projectileDisplayable));
+            const projectileDisplayable = this.makeProjectileDisplayable(projectile, source, () => this.removeFromEntityLayer(projectileDisplayable));
 
-            entityLayer.add(projectileDisplayable);
+            this.addToEntityLayer(projectileDisplayable);
             projectile.sprite = projectileDisplayable;
         });
     }
 
     makeProjectileDisplayable = (projectile, source, onExpire) => {
-        return this.sourcesToSpriteMakers.get(source)(projectile, onExpire);//Sprites.makeProjectileDisplayable(projectile, onExpire);
+        return this.sourcesToSpriteMakers.get(source)(projectile, onExpire);
     };
 
     initializePlayer = (entity, game, onExpire) => {

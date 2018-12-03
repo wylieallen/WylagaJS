@@ -1,10 +1,11 @@
 import HostileController from "./HostileController";
+import Stage from "../Stage";
 
 export default class StageController {
     constructor(width, height, game, onStageComplete) {
         const controlledEntities = new Set();
 
-        let stage = null;
+        let stage = new Stage([]);
 
         const nextWave = () => {
             const wave = stage.nextWave();
