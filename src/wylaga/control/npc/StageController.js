@@ -1,15 +1,14 @@
 import HostileController from "./HostileController";
-import Stage from "../Stage";
+import Stage from "../../Stage";
+import WaveController from "./WaveController";
 
 export default class StageController {
     constructor(width, height, game, onStageComplete) {
-        const controlledEntities = new Set();
-
         let stage = new Stage([]);
 
         const nextWave = () => {
             const wave = stage.nextWave();
-            wave.forEach(e => controlledEntities.add(e));
+            waveController.setWave(wave);
         };
 
         const onWaveExpiration = function() {
@@ -20,23 +19,15 @@ export default class StageController {
             }
         };
 
-        const onEntityExpiration = function(entity) {
-            if(controlledEntities.delete(entity)) {
-                if(controlledEntities.size <= 0) {
-                    onWaveExpiration();
-                }
-            }
-        };
+        const waveController = new WaveController(width, height, onWaveExpiration);
 
         this.setStage = nextStage => {
             stage = nextStage;
             nextWave();
         };
 
-        game.subscribeEntityExpired(onEntityExpiration);
+        game.subscribeEntityExpired(waveController.onEntityExpiration);
 
-        const entityController = new HostileController(controlledEntities, width, height);
-
-        this.update = () => entityController.update();
+        this.update = () => waveController.update();
     }
 }

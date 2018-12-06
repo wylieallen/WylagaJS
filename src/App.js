@@ -12,7 +12,7 @@ import Ship from "./wylaga/entities/Ship";
 import Projectile from "./wylaga/entities/Projectile";
 import TextDisplayable from "./displayables/primitives/TextDisplayable";
 import StageController from "./wylaga/control/npc/StageController";
-import Stage from "./wylaga/control/Stage";
+import Stage from "./wylaga/Stage";
 
 export const WIDTH = 1600, HEIGHT = 900;
 

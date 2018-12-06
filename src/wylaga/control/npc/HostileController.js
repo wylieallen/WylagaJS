@@ -1,5 +1,5 @@
 export default class HostileController {
-    constructor(entities, maxX, maxY) {
+    constructor(entity, maxX, maxY) {
         const minX = 0, minY = 0;
         maxY /= 2;
 
@@ -51,6 +51,6 @@ export default class HostileController {
             }
         };
 
-        this.update = () => entities.forEach(e => updateEntity(e));
+        this.update = () => updateEntity(entity);
     }
 }

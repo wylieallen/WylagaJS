@@ -43,11 +43,11 @@ export default class Model {
         // Initialize internal event listeners:
         initializeInternalEventListeners.bind(this)(expiredFriendlyShips, expiredFriendlyProjectiles, expiredHostileShips, expiredHostileProjectiles);
 
-        const northProjectileCatcher = new Ship(-50, -100, width + 100, 50, 0, -1);
+        const northProjectileCatcher = new Ship(-50, -200, width + 100, 50, 0, -1);
         northProjectileCatcher.isDead = () => false;
         this.spawnHostileShip(northProjectileCatcher);
 
-        const southProjectileCatcher = new Ship(-50, 950, width + 100, 50, 0, -1);
+        const southProjectileCatcher = new Ship(-50, 1050, width + 100, 50, 0, -1);
         southProjectileCatcher.isDead = () => false;
         this.spawnFriendlyShip(southProjectileCatcher);
     }
