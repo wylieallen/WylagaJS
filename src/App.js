@@ -37,12 +37,12 @@ export default class App extends Component {
             (x, y) => game.spawnFriendlyProjectile(new Projectile(x + 23, y - 5 - 2, 4, 15, 9, 0, -1, ship => ship.damage(1000)), player)
         );
 
-        this.initializeDisplayTree(player);
+        this.initializeScene(player);
         this.initializeGame(player, game);
         this.startTimer();
     }
 
-    initializeDisplayTree = (player) => {
+    initializeScene = (player) => {
         this.root = new CompositeDisplayable(0, 0);
         const entityLayer = new CompositeDisplayable(0, 0);
         const hudLayer = new CompositeDisplayable(0, 0);
@@ -167,11 +167,11 @@ export default class App extends Component {
 
         let baddies = [];
 
-        baddies = baddies.concat(this.initializeWing(game, onExpire, 200, 200));
-        baddies = baddies.concat(this.initializeWing(game, onExpire, 500, 175));
-        baddies = baddies.concat(this.initializeWing(game, onExpire, 800, 125));
-        baddies = baddies.concat(this.initializeWing(game, onExpire, 1100, 175));
-        baddies = baddies.concat(this.initializeWing(game, onExpire, 1400, 200));
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 200, 200 - 300));
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 500, 175 - 300));
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 800, 125 - 300));
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 1100, 175 - 300));
+        baddies = baddies.concat(this.initializeWing(game, onExpire, 1400, 200 - 300));
 
         return new Stage([baddies]);
     };
