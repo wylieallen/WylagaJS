@@ -4,19 +4,19 @@ self.__precacheManifest = [
     "url": "/WylagaJS/static/js/runtime~main.afd7aa4a.js"
   },
   {
-    "revision": "f8c4d7af461f426a598b",
-    "url": "/WylagaJS/static/js/main.f8c4d7af.chunk.js"
+    "revision": "81c337308e8cb7b22b62",
+    "url": "/WylagaJS/static/js/main.81c33730.chunk.js"
   },
   {
     "revision": "efc16a2bfa11662c669e",
     "url": "/WylagaJS/static/js/1.efc16a2b.chunk.js"
   },
   {
-    "revision": "f8c4d7af461f426a598b",
+    "revision": "81c337308e8cb7b22b62",
     "url": "/WylagaJS/static/css/main.69251f30.chunk.css"
   },
   {
-    "revision": "989007bbba3d17a32c273094a6b861a0",
+    "revision": "443338d3092e584547a8e6b28d400cc6",
     "url": "/WylagaJS/index.html"
   }
 ];
