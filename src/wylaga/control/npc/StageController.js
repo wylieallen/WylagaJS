@@ -1,4 +1,3 @@
-import HostileController from "./HostileController";
 import Stage from "../../Stage";
 import WaveController from "./WaveController";
 
