@@ -46,13 +46,13 @@ export default class HostileController {
         const quarterY = maxY / 2;
 
         const rallyEntity = (entity) => {
-            entity.setFiring(Math.random() <= 0.01);
 
-            const y = entity.getY();
-
-            if(y >= quarterY) {
+            if(entity.getY() >= quarterY) {
+                entity.setBoosting(false);
+                entity.setTrajectory((Math.random() * 2) - 1, (Math.random() * 2) - 1);
                 updateEntity = drunkenEntity;
             } else {
+                entity.setBoosting(true);
                 entity.setTrajectory(0, 1);
             }
         };

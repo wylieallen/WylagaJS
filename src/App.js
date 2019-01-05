@@ -189,7 +189,7 @@ export default class App extends Component {
         badGuy2.sprite = Sprites.makeModularEnemyDisplayable(badGuy2, onExpire);
         this.sourcesToSpriteMakers.set(badGuy2, Sprites.makeSmallEnemyProjectile);
 
-        const bigBadGuy = new Ship(x - 25, y - 25, 50, 50, 0.3, 150, game.expireHostileShip, (x, y) => {
+        const bigBadGuy = new Ship(x - 25, y - 25, 50, 50, 0.7, 150, game.expireHostileShip, (x, y) => {
             game.spawnHostileProjectile(new Projectile(x + 21, y + 42, 8, 8, 6, 0, 1, ship => ship.damage(25)), bigBadGuy);
         });
         bigBadGuy.sprite = Sprites.makeNewBigEnemyDisplayable(bigBadGuy, onExpire);
