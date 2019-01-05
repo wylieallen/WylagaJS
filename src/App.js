@@ -34,7 +34,7 @@ export default class App extends Component {
 
         const game = new Model(WIDTH, HEIGHT);
         const player = new Ship((WIDTH / 2) - (25), (3 * HEIGHT / 4) - (25), 50, 50, 3, 100, game.expireFriendlyShip,
-            (x, y) => game.spawnFriendlyProjectile(new Projectile(x + 23, y - 5 - 2, 4, 15, 9, 0, -1, ship => ship.damage(1000)), player)
+            (x, y) => game.spawnFriendlyProjectile(new Projectile(x + 23, y - 5 - 2, 4, 15, 9, 0, -1, ship => ship.damage(15)), player)
         );
 
         this.initializeScene(player);

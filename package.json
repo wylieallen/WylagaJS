@@ -2,7 +2,7 @@
   "name": "wylaga-js",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://wylieallen.github.io/wylaga-js",
+  "homepage": "http://wylieallen.github.io/WylagaJS",
   "dependencies": {
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
