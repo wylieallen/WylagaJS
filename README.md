@@ -1,3 +1,5 @@
+## Welcome to WylagaJS!
+
 WylagaJS is a browser-based port of [Wylaga](https://github.com/wylieallen/Wylaga), my JVM-based arcade shooter. If you have a keyboard, [try it now!](https://wylieallen.github.io/WylagaJS)
 
 Development of this family of projects is continuing at [WylagaKT](https://github.com/wylieallen/WylagaKT), a multiplatform Kotlin implementation.
